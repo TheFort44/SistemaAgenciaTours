@@ -33,7 +33,7 @@ namespace SistemaAgenciaTours.Controllers
             if (oUsuario.IdUsuario != 0)
             {
                 HttpContext.Session.SetString("usuario", JsonConvert.SerializeObject(oUsuario));
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Tours");
             }
             else
             {
@@ -50,6 +50,12 @@ namespace SistemaAgenciaTours.Controllers
         [HttpPost]
         public IActionResult Registrar(Usuario oUsuario)
         {
+            if (!ModelState.IsValid)
+            {
+                // Si el modelo no es válido (por ejemplo, contraseñas no coinciden), se devuelve la vista con errores.
+                return View(oUsuario);
+            }
+
             bool registrado;
             string mensaje;
 
@@ -69,15 +75,25 @@ namespace SistemaAgenciaTours.Controllers
                 mensaje = cmd.Parameters["Mensaje"].Value.ToString();
             }
 
-            ViewData["Mensaje"] = mensaje;
-
             if (registrado)
-                return RedirectToAction("Login", "Acceso");
+            {
+                TempData["mensaje"] = mensaje;
+                return RedirectToAction("Login"); // o a donde tú quieras
+            }
             else
-                return View();
+            {
+                ViewData["mensaje"] = mensaje;
+                return View(oUsuario);
+            }
         }
 
         public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login", "Acceso");
+        }
+
+        public IActionResult CerrarSesion()
         {
             HttpContext.Session.Clear();
             return RedirectToAction("Login", "Acceso");

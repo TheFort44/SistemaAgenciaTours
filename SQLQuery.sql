@@ -62,3 +62,7 @@ INNER JOIN Destino D ON T.DestinoID = D.DestinoID
 INNER JOIN Pais P ON T.PaisID = P.PaisID;
 
 SELECT * FROM Vista_TourConEstado
+
+use DB_ACCESO
+
+SELECT * FROM dbo.USUARIO
