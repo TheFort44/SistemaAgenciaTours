@@ -17,6 +17,7 @@
             <th>Precio</th>
             <th>ITBIS (18%)</th>
             <th>Estado</th>
+            <th>Acción</th>
         </tr>
     </thead>
     <tbody>
@@ -31,6 +32,12 @@
                 <td>@tour.Precio.ToString("C")</td>
                 <td>@tour.ITBIS.ToString("C")</td>
                 <td>@tour.Estado</td>
+                <td>
+                    <form asp-action="AgregarAlCarrito" asp-controller="Tours" method="post">
+                        <input type="hidden" name="id" value="@tour.TourID" />
+                        <button type="submit" class="btn btn-sm btn-primary">Agregar al carrito</button>
+                    </form>
+                </td>
             </tr>
         }
     </tbody>

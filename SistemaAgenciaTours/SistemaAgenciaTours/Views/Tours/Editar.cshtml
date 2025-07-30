@@ -1,0 +1,66 @@
+﻿@model SistemaAgenciaTours.Models.ToursViewModel
+
+@{
+    ViewData["Title"] = "Editar Tour";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Editar" method="post">
+    <input type="hidden" asp-for="TourID" />
+
+    <div class="form-group mb-3">
+        <label asp-for="NombreTour"></label>
+        <input asp-for="NombreTour" class="form-control" />
+        <span asp-validation-for="NombreTour" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="PaisID"></label>
+        <input asp-for="PaisID" type="number" class="form-control" />
+        <span asp-validation-for="PaisID" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="DestinoID"></label>
+        <input asp-for="DestinoID" type="number" class="form-control" />
+        <span asp-validation-for="DestinoID" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Fecha"></label>
+        <input asp-for="Fecha" type="date" class="form-control" />
+        <span asp-validation-for="Fecha" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Hora"></label>
+        <input asp-for="Hora" type="time" class="form-control" />
+        <span asp-validation-for="Hora" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Precio"></label>
+        <input asp-for="Precio" type="number" step="0.01" class="form-control" />
+        <span asp-validation-for="Precio" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="ITBIS"></label>
+        <input asp-for="ITBIS" type="number" step="0.01" class="form-control" />
+        <span asp-validation-for="ITBIS" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Estado"></label>
+        <input asp-for="Estado" class="form-control" />
+        <span asp-validation-for="Estado" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Actualizar</button>
+    <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

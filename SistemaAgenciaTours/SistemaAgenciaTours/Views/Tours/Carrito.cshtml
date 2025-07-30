@@ -1,0 +1,62 @@
+﻿@model IEnumerable<SistemaAgenciaTours.Models.ToursViewModel>
+
+@{
+    ViewData["Title"] = "Mi Carrito de Tours";
+}
+
+<h2 class="mb-4 text-primary">@ViewData["Title"]</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        No tienes tours en el carrito todavía.
+    </div>
+}
+else
+{
+    <table class="table table-striped table-bordered table-hover">
+        <thead class="bg-dark text-white">
+            <tr>
+                <th>Tour</th>
+                <th>País</th>
+                <th>Destino</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Precio</th>
+                <th>ITBIS (18%)</th>
+                <th>Estado</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var tour in Model)
+            {
+                <tr>
+                    <td>@tour.NombreTour</td>
+                    <td>@tour.NombrePais</td>
+                    <td>@tour.NombreDestino</td>
+                    <td>@tour.Fecha.ToString("dd/MM/yyyy")</td>
+                    <td>@DateTime.Today.Add(tour.Hora).ToString("hh:mm tt")</td>
+                    <td>@tour.Precio.ToString("C", new System.Globalization.CultureInfo("es-DO"))</td>
+                    <td>@tour.ITBIS.ToString("C", new System.Globalization.CultureInfo("es-DO"))</td>
+                    <td>
+                        @if (tour.Estado == "Activo")
+                        {
+                            <span class="badge bg-success">Activo</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">@tour.Estado</span>
+                        }
+                    </td>
+                    <td>
+                        <form asp-action="EliminarDelCarrito" asp-controller="Tours" method="post">
+                            <input type="hidden" name="id" value="@tour.TourID" />
+                            <button type="submit" class="btn btn-sm btn-danger">Quitar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

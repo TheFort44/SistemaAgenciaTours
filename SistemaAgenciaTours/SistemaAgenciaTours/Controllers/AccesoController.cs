@@ -33,7 +33,7 @@ namespace SistemaAgenciaTours.Controllers
             if (oUsuario.IdUsuario != 0)
             {
                 HttpContext.Session.SetString("usuario", JsonConvert.SerializeObject(oUsuario));
-                return RedirectToAction("Index", "Tours");
+                return RedirectToAction("IndexAdministrador", "Tours");
             }
             else
             {
