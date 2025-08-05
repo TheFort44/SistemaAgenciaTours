@@ -14,5 +14,9 @@
         public decimal ITBIS { get; set; }
         public string Estado { get; set; }
         public string ImagenRuta { get; set; }
+
+        public int DuracionDias { get; set; }
+        public DateTime FechaHoraFin { get; set; }
+
     }
 }

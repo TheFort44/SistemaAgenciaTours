@@ -16,7 +16,9 @@
             <th>Hora</th>
             <th>Precio</th>
             <th>ITBIS (18%)</th>
+            <th>Duración (días)</th>
             <th>Estado</th>
+            <th>Imagen</th>
             <th>Acción</th>
         </tr>
     </thead>
@@ -31,6 +33,7 @@
                 <td>@tour.Hora.ToString(@"hh\:mm")</td>
                 <td>@tour.Precio.ToString("C")</td>
                 <td>@tour.ITBIS.ToString("C")</td>
+                <td>@tour.DuracionDias</td>
                 <td>@tour.Estado</td>
                 <td>
                     @if (!string.IsNullOrEmpty(tour.ImagenRuta))
@@ -38,7 +41,6 @@
                         <img src="@tour.ImagenRuta" alt="Imagen del Tour" width="100" />
                     }
                 </td>
-
                 <td>
                     <form asp-action="AgregarAlCarrito" asp-controller="Tours" method="post">
                         <input type="hidden" name="id" value="@tour.TourID" />

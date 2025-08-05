@@ -12,7 +12,6 @@ namespace SistemaAgenciaTours.Controllers
     {
         static string cadena = "Data Source=DESKTOP-GBKGIUE\\SQLEXPRESS;Initial Catalog=SistemaAgenciaTours;Integrated Security=true;TrustServerCertificate=True;";
 
-        // Obtener lista de tours
         private List<ToursViewModel> ObtenerTours()
         {
             var tours = new List<ToursViewModel>();
@@ -21,7 +20,6 @@ namespace SistemaAgenciaTours.Controllers
                 string sql = "SELECT * FROM Vista_TourConEstado";
                 SqlCommand cmd = new SqlCommand(sql, cn);
                 cn.Open();
-
                 using (SqlDataReader dr = cmd.ExecuteReader())
                 {
                     while (dr.Read())
@@ -38,7 +36,9 @@ namespace SistemaAgenciaTours.Controllers
                             Hora = dr.GetTimeSpan(dr.GetOrdinal("Hora")),
                             Precio = dr.GetDecimal(dr.GetOrdinal("Precio")),
                             ITBIS = dr.GetDecimal(dr.GetOrdinal("ITBIS")),
-                            Estado = dr.GetString(dr.GetOrdinal("Estado"))
+                            Estado = dr.GetString(dr.GetOrdinal("Estado")),
+                            DuracionDias = Convert.ToInt32(dr.GetDouble(dr.GetOrdinal("DuracionDias"))),
+                            FechaHoraFin = dr.GetDateTime(dr.GetOrdinal("FechaHoraFin"))
                         });
                     }
                 }
@@ -115,11 +115,9 @@ namespace SistemaAgenciaTours.Controllers
                 .Select(d => new SelectListItem { Value = d.DestinoID.ToString(), Text = d.NombreDestino })
                 .ToList();
 
-
             return View();
         }
 
-        // POST: Tours/Crear
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Crear(ToursViewModel tour, IFormFile Imagen)
@@ -146,18 +144,19 @@ namespace SistemaAgenciaTours.Controllers
 
             using (SqlConnection cn = new SqlConnection(cadena))
             {
-                string sql = "INSERT INTO Tour (NombreTour, PaisID, DestinoID, Fecha, Hora, Precio, ITBIS, Estado, ImagenRuta) " +
-                             "VALUES (@NombreTour, @PaisID, @DestinoID, @Fecha, @Hora, @Precio, @ITBIS, @Estado, @ImagenRuta)";
+                string sql = @"INSERT INTO Tour 
+                       (NombreTour, PaisID, DestinoID, Fecha, Hora, Precio, ImagenRuta) 
+                       VALUES 
+                       (@NombreTour, @PaisID, @DestinoID, @Fecha, @Hora, @Precio, @ImagenRuta)";
 
                 SqlCommand cmd = new SqlCommand(sql, cn);
+
                 cmd.Parameters.AddWithValue("@NombreTour", tour.NombreTour);
                 cmd.Parameters.AddWithValue("@PaisID", tour.PaisID);
                 cmd.Parameters.AddWithValue("@DestinoID", tour.DestinoID);
                 cmd.Parameters.AddWithValue("@Fecha", tour.Fecha);
                 cmd.Parameters.AddWithValue("@Hora", tour.Hora);
                 cmd.Parameters.AddWithValue("@Precio", tour.Precio);
-                cmd.Parameters.AddWithValue("@ITBIS", tour.ITBIS);
-                cmd.Parameters.AddWithValue("@Estado", tour.Estado);
                 cmd.Parameters.AddWithValue("@ImagenRuta", rutaImagen ?? (object)DBNull.Value);
 
                 cn.Open();
@@ -166,6 +165,7 @@ namespace SistemaAgenciaTours.Controllers
 
             return RedirectToAction("IndexAdministrador");
         }
+
 
         // GET: Tours/Editar/5
         public IActionResult Editar(int id)
@@ -194,44 +194,80 @@ namespace SistemaAgenciaTours.Controllers
             return View(tour);
         }
 
-        // POST: Tours/Editar/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Editar(int id, ToursViewModel model)
+        public async Task<IActionResult> Editar(ToursViewModel tour, IFormFile Imagen)
         {
-            if (!ModelState.IsValid)
-                return View(model);
-
             try
             {
+                tour.ITBIS = tour.Precio * 0.18m;
+
+                string rutaImagen = null;
+
+                if (Imagen != null && Imagen.Length > 0)
+                {
+                    var nombreArchivo = Path.GetFileName(Imagen.FileName);
+                    var rutaCarpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/imagenes");
+
+                    if (!Directory.Exists(rutaCarpeta))
+                        Directory.CreateDirectory(rutaCarpeta);
+
+                    var rutaCompleta = Path.Combine(rutaCarpeta, nombreArchivo);
+
+                    using (var stream = new FileStream(rutaCompleta, FileMode.Create))
+                    {
+                        await Imagen.CopyToAsync(stream);
+                    }
+
+                    rutaImagen = "/imagenes/" + nombreArchivo;
+                }
+
                 using (SqlConnection cn = new SqlConnection(cadena))
                 {
-                    string sql = @"UPDATE Tours SET 
-                        NombreTour=@NombreTour, PaisID=@PaisID, DestinoID=@DestinoID, 
-                        Fecha=@Fecha, Hora=@Hora, Precio=@Precio, ITBIS=@ITBIS, Estado=@Estado 
-                        WHERE TourID=@id";
+                    string sql = @"UPDATE Tour SET 
+                NombreTour = @NombreTour,
+                PaisID = @PaisID,
+                DestinoID = @DestinoID,
+                Fecha = @Fecha,
+                Hora = @Hora,
+                Precio = @Precio,
+                ITBIS = @ITBIS" +
+                        (rutaImagen != null ? ", ImagenRuta = @ImagenRuta" : "") +
+                        " WHERE TourID = @TourID";
+
                     SqlCommand cmd = new SqlCommand(sql, cn);
-                    cmd.Parameters.AddWithValue("@NombreTour", model.NombreTour);
-                    cmd.Parameters.AddWithValue("@PaisID", model.PaisID);
-                    cmd.Parameters.AddWithValue("@DestinoID", model.DestinoID);
-                    cmd.Parameters.AddWithValue("@Fecha", model.Fecha);
-                    cmd.Parameters.AddWithValue("@Hora", model.Hora);
-                    cmd.Parameters.AddWithValue("@Precio", model.Precio);
-                    cmd.Parameters.AddWithValue("@ITBIS", model.ITBIS);
-                    cmd.Parameters.AddWithValue("@Estado", model.Estado);
-                    cmd.Parameters.AddWithValue("@id", id);
+                    cmd.Parameters.AddWithValue("@TourID", tour.TourID);
+                    cmd.Parameters.AddWithValue("@NombreTour", tour.NombreTour);
+                    cmd.Parameters.AddWithValue("@PaisID", tour.PaisID);
+                    cmd.Parameters.AddWithValue("@DestinoID", tour.DestinoID);
+                    cmd.Parameters.AddWithValue("@Fecha", tour.Fecha);
+                    cmd.Parameters.AddWithValue("@Hora", tour.Hora);
+                    cmd.Parameters.AddWithValue("@Precio", tour.Precio);
+                    cmd.Parameters.AddWithValue("@ITBIS", tour.ITBIS);
+                    if (rutaImagen != null)
+                        cmd.Parameters.AddWithValue("@ImagenRuta", rutaImagen);
 
                     cn.Open();
                     cmd.ExecuteNonQuery();
                 }
-                return RedirectToAction(nameof(IndexAdministrador));
+
+                return RedirectToAction("IndexAdministrador");
             }
             catch
             {
-                ModelState.AddModelError("", "Error al actualizar el tour.");
-                return View(model);
+                ViewBag.Paises = ObtenerPaises()
+                    .Select(p => new SelectListItem { Value = p.PaisID.ToString(), Text = p.NombrePais })
+                    .ToList();
+
+                ViewBag.Destinos = ObtenerDestinos()
+                    .Select(d => new SelectListItem { Value = d.DestinoID.ToString(), Text = d.NombreDestino })
+                    .ToList();
+
+                return View(tour);
             }
         }
+
+
 
         // GET: Tours/Eliminar/5
         public IActionResult Eliminar(int id)
@@ -241,7 +277,6 @@ namespace SistemaAgenciaTours.Controllers
             return View(tour);
         }
 
-        // POST: Tours/Eliminar/5
         [HttpPost, ActionName("Eliminar")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
@@ -250,12 +285,13 @@ namespace SistemaAgenciaTours.Controllers
             {
                 using (SqlConnection cn = new SqlConnection(cadena))
                 {
-                    string sql = "DELETE FROM Tours WHERE TourID = @id";
+                    string sql = "DELETE FROM Tour WHERE TourID = @id";
                     SqlCommand cmd = new SqlCommand(sql, cn);
                     cmd.Parameters.AddWithValue("@id", id);
                     cn.Open();
                     cmd.ExecuteNonQuery();
                 }
+
                 return RedirectToAction(nameof(IndexAdministrador));
             }
             catch
