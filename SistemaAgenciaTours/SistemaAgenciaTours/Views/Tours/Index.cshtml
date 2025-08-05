@@ -33,6 +33,13 @@
                 <td>@tour.ITBIS.ToString("C")</td>
                 <td>@tour.Estado</td>
                 <td>
+                    @if (!string.IsNullOrEmpty(tour.ImagenRuta))
+                    {
+                        <img src="@tour.ImagenRuta" alt="Imagen del Tour" width="100" />
+                    }
+                </td>
+
+                <td>
                     <form asp-action="AgregarAlCarrito" asp-controller="Tours" method="post">
                         <input type="hidden" name="id" value="@tour.TourID" />
                         <button type="submit" class="btn btn-sm btn-primary">Agregar al carrito</button>

@@ -115,44 +115,56 @@ namespace SistemaAgenciaTours.Controllers
                 .Select(d => new SelectListItem { Value = d.DestinoID.ToString(), Text = d.NombreDestino })
                 .ToList();
 
+
             return View();
         }
 
         // POST: Tours/Crear
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Crear(ToursViewModel model)
+        public async Task<IActionResult> Crear(ToursViewModel tour, IFormFile Imagen)
         {
-            if (!ModelState.IsValid)
-                return View(model);
+            string rutaImagen = null;
 
-            try
+            if (Imagen != null && Imagen.Length > 0)
             {
-                using (SqlConnection cn = new SqlConnection(cadena))
+                var nombreArchivo = Path.GetFileName(Imagen.FileName);
+                var rutaCarpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/imagenes");
+
+                if (!Directory.Exists(rutaCarpeta))
+                    Directory.CreateDirectory(rutaCarpeta);
+
+                var rutaCompleta = Path.Combine(rutaCarpeta, nombreArchivo);
+
+                using (var stream = new FileStream(rutaCompleta, FileMode.Create))
                 {
-                    string sql = @"INSERT INTO Tours 
-                        (NombreTour, PaisID, DestinoID, Fecha, Hora, Precio, ITBIS, Estado) 
-                        VALUES (@NombreTour, @PaisID, @DestinoID, @Fecha, @Hora, @Precio, @ITBIS, @Estado)";
-                    SqlCommand cmd = new SqlCommand(sql, cn);
-                    cmd.Parameters.AddWithValue("@NombreTour", model.NombreTour);
-                    cmd.Parameters.AddWithValue("@PaisID", model.PaisID);
-                    cmd.Parameters.AddWithValue("@DestinoID", model.DestinoID);
-                    cmd.Parameters.AddWithValue("@Fecha", model.Fecha);
-                    cmd.Parameters.AddWithValue("@Hora", model.Hora);
-                    cmd.Parameters.AddWithValue("@Precio", model.Precio);
-                    cmd.Parameters.AddWithValue("@ITBIS", model.ITBIS);
-                    cmd.Parameters.AddWithValue("@Estado", model.Estado);
-
-                    cn.Open();
-                    cmd.ExecuteNonQuery();
+                    await Imagen.CopyToAsync(stream);
                 }
-                return RedirectToAction(nameof(IndexAdministrador));
+
+                rutaImagen = "/imagenes/" + nombreArchivo;
             }
-            catch
+
+            using (SqlConnection cn = new SqlConnection(cadena))
             {
-                ModelState.AddModelError("", "Error al guardar el tour.");
-                return View(model);
+                string sql = "INSERT INTO Tour (NombreTour, PaisID, DestinoID, Fecha, Hora, Precio, ITBIS, Estado, ImagenRuta) " +
+                             "VALUES (@NombreTour, @PaisID, @DestinoID, @Fecha, @Hora, @Precio, @ITBIS, @Estado, @ImagenRuta)";
+
+                SqlCommand cmd = new SqlCommand(sql, cn);
+                cmd.Parameters.AddWithValue("@NombreTour", tour.NombreTour);
+                cmd.Parameters.AddWithValue("@PaisID", tour.PaisID);
+                cmd.Parameters.AddWithValue("@DestinoID", tour.DestinoID);
+                cmd.Parameters.AddWithValue("@Fecha", tour.Fecha);
+                cmd.Parameters.AddWithValue("@Hora", tour.Hora);
+                cmd.Parameters.AddWithValue("@Precio", tour.Precio);
+                cmd.Parameters.AddWithValue("@ITBIS", tour.ITBIS);
+                cmd.Parameters.AddWithValue("@Estado", tour.Estado);
+                cmd.Parameters.AddWithValue("@ImagenRuta", rutaImagen ?? (object)DBNull.Value);
+
+                cn.Open();
+                cmd.ExecuteNonQuery();
             }
+
+            return RedirectToAction("IndexAdministrador");
         }
 
         // GET: Tours/Editar/5

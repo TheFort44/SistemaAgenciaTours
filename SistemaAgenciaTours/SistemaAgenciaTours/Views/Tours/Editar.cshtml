@@ -47,14 +47,18 @@
 
     <div class="form-group mb-3">
         <label asp-for="ITBIS"></label>
-        <input asp-for="ITBIS" type="number" step="0.01" class="form-control" />
-        <span asp-validation-for="ITBIS" class="text-danger"></span>
+        <input asp-for="ITBIS" class="form-control" readonly />
     </div>
 
     <div class="form-group mb-3">
         <label asp-for="Estado"></label>
         <input asp-for="Estado" class="form-control" />
         <span asp-validation-for="Estado" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="Imagen">Imagen del tour</label>
+        <input type="file" name="Imagen" class="form-control" />
     </div>
 
     <button type="submit" class="btn btn-primary">Actualizar</button>

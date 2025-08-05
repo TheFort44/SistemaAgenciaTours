@@ -13,5 +13,6 @@
         public decimal Precio { get; set; }
         public decimal ITBIS { get; set; }
         public string Estado { get; set; }
+        public string ImagenRuta { get; set; }
     }
 }
