@@ -32,7 +32,7 @@
                 <td>@tour.Fecha.ToString("yyyy-MM-dd")</td>
                 <td>@tour.Hora.ToString(@"hh\:mm")</td>
                 <td>@tour.Precio.ToString("C")</td>
-                <td>@tour.ITBIS.ToString("C")</td>
+                <td>@tour.ITBIS?.ToString("C")</td>
                 <td>@tour.DuracionDias</td>
                 <td>@tour.Estado</td>
                 <td>

@@ -198,8 +198,14 @@ namespace SistemaAgenciaTours.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Editar(ToursViewModel tour, IFormFile Imagen)
         {
-            try
-            {
+            ViewBag.Paises = ObtenerPaises()
+                .Select(p => new SelectListItem { Value = p.PaisID.ToString(), Text = p.NombrePais })
+                .ToList();
+
+            ViewBag.Destinos = ObtenerDestinos()
+                .Select(d => new SelectListItem { Value = d.DestinoID.ToString(), Text = d.NombreDestino })
+                .ToList();
+            
                 tour.ITBIS = tour.Precio * 0.18m;
 
                 string rutaImagen = null;
@@ -224,16 +230,22 @@ namespace SistemaAgenciaTours.Controllers
 
                 using (SqlConnection cn = new SqlConnection(cadena))
                 {
-                    string sql = @"UPDATE Tour SET 
-                NombreTour = @NombreTour,
-                PaisID = @PaisID,
-                DestinoID = @DestinoID,
-                Fecha = @Fecha,
-                Hora = @Hora,
-                Precio = @Precio,
-                ITBIS = @ITBIS" +
-                        (rutaImagen != null ? ", ImagenRuta = @ImagenRuta" : "") +
-                        " WHERE TourID = @TourID";
+                    string sql = @"UPDATE Tour SET
+                                NombreTour = @NombreTour,
+                                PaisID = @PaisID,
+                                DestinoID = @DestinoID,
+                                Fecha = @Fecha,
+                                Hora = @Hora,
+                                Precio = @Precio";
+
+                                if (rutaImagen != null)
+                                    sql += ", ImagenRuta = @ImagenRuta";
+
+                                    sql += " WHERE TourID = @TourID";
+
+
+
+
 
                     SqlCommand cmd = new SqlCommand(sql, cn);
                     cmd.Parameters.AddWithValue("@TourID", tour.TourID);
@@ -243,28 +255,14 @@ namespace SistemaAgenciaTours.Controllers
                     cmd.Parameters.AddWithValue("@Fecha", tour.Fecha);
                     cmd.Parameters.AddWithValue("@Hora", tour.Hora);
                     cmd.Parameters.AddWithValue("@Precio", tour.Precio);
-                    cmd.Parameters.AddWithValue("@ITBIS", tour.ITBIS);
+                    //cmd.Parameters.AddWithValue("@ITBIS", tour.ITBIS);
                     if (rutaImagen != null)
                         cmd.Parameters.AddWithValue("@ImagenRuta", rutaImagen);
-
                     cn.Open();
                     cmd.ExecuteNonQuery();
+                    
                 }
-
-                return RedirectToAction("IndexAdministrador");
-            }
-            catch
-            {
-                ViewBag.Paises = ObtenerPaises()
-                    .Select(p => new SelectListItem { Value = p.PaisID.ToString(), Text = p.NombrePais })
-                    .ToList();
-
-                ViewBag.Destinos = ObtenerDestinos()
-                    .Select(d => new SelectListItem { Value = d.DestinoID.ToString(), Text = d.NombreDestino })
-                    .ToList();
-
-                return View(tour);
-            }
+            return RedirectToAction("IndexAdministrador");
         }
 
 

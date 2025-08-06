@@ -1,4 +1,6 @@
-﻿namespace SistemaAgenciaTours.Models
+﻿using System.ComponentModel;
+
+namespace SistemaAgenciaTours.Models
 {
     public class ToursViewModel
     {
@@ -11,7 +13,7 @@
         public DateTime Fecha { get; set; }
         public TimeSpan Hora { get; set; }
         public decimal Precio { get; set; }
-        public decimal ITBIS { get; set; }
+        public decimal? ITBIS { get; set; }
         public string Estado { get; set; }
         public string ImagenRuta { get; set; }
 

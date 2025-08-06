@@ -1,5 +1,6 @@
 ﻿@model IEnumerable<SistemaAgenciaTours.Models.ToursViewModel>
 
+
 @{
     ViewData["Title"] = "Mi Carrito de Tours";
 }
@@ -38,7 +39,7 @@ else
                     <td>@tour.Fecha.ToString("dd/MM/yyyy")</td>
                     <td>@DateTime.Today.Add(tour.Hora).ToString("hh:mm tt")</td>
                     <td>@tour.Precio.ToString("C", new System.Globalization.CultureInfo("es-DO"))</td>
-                    <td>@tour.ITBIS.ToString("C", new System.Globalization.CultureInfo("es-DO"))</td>
+                    <td>@tour.ITBIS?.ToString("C", new System.Globalization.CultureInfo("es-DO"))</td>
                     <td>
                         @if (tour.Estado == "Activo")
                         {
