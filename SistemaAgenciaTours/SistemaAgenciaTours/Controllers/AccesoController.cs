@@ -52,7 +52,6 @@ namespace SistemaAgenciaTours.Controllers
         {
             if (!ModelState.IsValid)
             {
-                // Si el modelo no es válido (por ejemplo, contraseñas no coinciden), se devuelve la vista con errores.
                 return View(oUsuario);
             }
 
@@ -78,7 +77,7 @@ namespace SistemaAgenciaTours.Controllers
             if (registrado)
             {
                 TempData["mensaje"] = mensaje;
-                return RedirectToAction("Login"); // o a donde tú quieras
+                return RedirectToAction("Login");
             }
             else
             {

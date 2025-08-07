@@ -4,50 +4,66 @@
     ViewData["Title"] = "Tours Disponibles";
 }
 
-<h2>@ViewData["Title"]</h2>
+<link href="~/css/tourindex.css" rel="stylesheet" />
 
-<table class="table table-striped table-bordered">
-    <thead class="thead-dark">
-        <tr>
-            <th>Tour</th>
-            <th>País</th>
-            <th>Destino</th>
-            <th>Fecha</th>
-            <th>Hora</th>
-            <th>Precio</th>
-            <th>ITBIS (18%)</th>
-            <th>Duración (días)</th>
-            <th>Estado</th>
-            <th>Imagen</th>
-            <th>Acción</th>
-        </tr>
-    </thead>
-    <tbody>
+<div class="container-tours">
+    <h2>@ViewData["Title"]</h2>
+
+    <div class="tours-grid">
         @foreach (var tour in Model)
         {
-            <tr>
-                <td>@tour.NombreTour</td>
-                <td>@tour.NombrePais</td>
-                <td>@tour.NombreDestino</td>
-                <td>@tour.Fecha.ToString("yyyy-MM-dd")</td>
-                <td>@tour.Hora.ToString(@"hh\:mm")</td>
-                <td>@tour.Precio.ToString("C")</td>
-                <td>@tour.ITBIS?.ToString("C")</td>
-                <td>@tour.DuracionDias</td>
-                <td>@tour.Estado</td>
-                <td>
-                    @if (!string.IsNullOrEmpty(tour.ImagenRuta))
-                    {
-                        <img src="@tour.ImagenRuta" alt="Imagen del Tour" width="100" />
-                    }
-                </td>
-                <td>
-                    <form asp-action="AgregarAlCarrito" asp-controller="Tours" method="post">
-                        <input type="hidden" name="id" value="@tour.TourID" />
+            <div class="tour-card">
+                @if (!string.IsNullOrEmpty(tour.ImagenRuta))
+                {
+                    <img src="@tour.ImagenRuta" alt="Imagen del Tour" />
+                }
+                <div class="tour-content">
+                    <h3>@tour.NombreTour</h3>
+                    <div class="tour-details">
+                        <p><strong>País:</strong> @tour.NombrePais</p>
+                        <p><strong>Destino:</strong> @tour.NombreDestino</p>
+                        <p><strong>Fecha:</strong> @tour.Fecha.ToString("yyyy-MM-dd")</p>
+                        <p><strong>Hora:</strong> @tour.Hora.ToString(@"hh\:mm")</p>
+                        <p><strong>Precio:</strong> @tour.Precio.ToString("C")</p>
+                        <p><strong>ITBIS (18%):</strong> @tour.ITBIS?.ToString("C")</p>
+                        <p><strong>Duración (días):</strong> @tour.DuracionDias</p>
+                    </div>
+                    <span class="tour-status @tour.Estado.Replace(" ", "")">@tour.Estado</span>
+
+                    <form class="agregar-carrito-form" data-tourid="@tour.TourID">
                         <button type="submit" class="btn btn-sm btn-primary">Agregar al carrito</button>
                     </form>
-                </td>
-            </tr>
+                </div>
+            </div>
         }
-    </tbody>
-</table>
+    </div>
+
+    <div class="export-btn-container">
+        <form asp-action="ExportarToursCSV" method="post">
+            <button type="submit">Exportar a CSV</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.agregar-carrito-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const tourId = this.getAttribute('data-tourid');
+
+            fetch('/Tours/AgregarAlCarrito', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ id: tourId })
+            })
+            .then(response => {
+                if(response.ok){
+                    alert('Tour agregado al carrito!');
+                } else {
+                    alert('Error al agregar al carrito.');
+                }
+            })
+            .catch(() => alert('Error en la conexión.'));
+        });
+    });
+</script>

@@ -1,0 +1,25 @@
+﻿/* carrito.css */
+.card {
+    border-radius: 12px;
+    transition: transform 0.3s ease;
+}
+
+    .card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+.card-title {
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.btn-outline-danger {
+    border-radius: 25px;
+    padding: 5px 15px;
+}
+
+.badge {
+    font-size: 0.85rem;
+    padding: 0.4em 0.75em;
+}

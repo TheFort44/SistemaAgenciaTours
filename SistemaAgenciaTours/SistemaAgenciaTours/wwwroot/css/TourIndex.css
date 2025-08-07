@@ -1,0 +1,134 @@
+﻿/* Fondo degradado con textura sutil */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #5b86e5, #36d1dc);
+    min-height: 100vh;
+    margin: 0;
+    padding: 40px 20px;
+    color: #333;
+}
+
+/* Contenedor principal para centrar y dar padding */
+.container-tours {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Título estilizado */
+h2 {
+    text-align: center;
+    font-size: 2.8rem;
+    color: #fff;
+    margin-bottom: 40px;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+}
+
+/* Grid moderno para los tours */
+.tours-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 25px;
+}
+
+/* Cada tarjeta de tour */
+.tour-card {
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .tour-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Imagen sin distorsión, alto fijo y ancho al 100% */
+    .tour-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+/* Contenido interno */
+.tour-content {
+    padding: 20px 25px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+    /* Título del tour */
+    .tour-content h3 {
+        margin: 0 0 10px 0;
+        color: #0366d6;
+    }
+
+/* Datos del tour */
+.tour-details {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 15px;
+    flex-grow: 1;
+}
+
+/* Estado destacado */
+.tour-status {
+    font-weight: 600;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+    .tour-status.Próximo {
+        background-color: #2ecc71;
+    }
+
+    .tour-status["En curso"] {
+        background-color: #f39c12;
+    }
+
+    .tour-status.Finalizado {
+        background-color: #95a5a6;
+    }
+
+/* Botón atractivo */
+.tour-card form button {
+    background-color: #0366d6;
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+    .tour-card form button:hover {
+        background-color: #024e9b;
+    }
+
+/* Botón Exportar a CSV al final, centrado y destacado */
+.export-btn-container {
+    text-align: center;
+    margin-top: 40px;
+}
+
+    .export-btn-container button {
+        background-color: #27ae60;
+        border: none;
+        color: white;
+        font-size: 1.2rem;
+        padding: 14px 40px;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+        .export-btn-container button:hover {
+            background-color: #1e8449;
+        }

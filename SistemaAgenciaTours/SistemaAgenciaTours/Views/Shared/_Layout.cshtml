@@ -1,59 +1,82 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+
+<style>
+
+    .navbar-brand img {
+        max-height: 50px; 
+        width: auto;
+        margin-right: 10px;
+        filter: drop-shadow(0 0 1px rgba(0,0,0,0.3));
+        background: white; 
+        padding: 2px;
+        border-radius: 4px;
+    }
+</style>
+<html lang="es">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - SistemaAgenciaTours</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - Escalante Tours</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/SistemaAgenciaTours.styles.css" asp-append-version="true" />
+    <style>
+        .navbar-brand img {
+            height: 40px;
+            width: auto;
+            margin-right: 10px;
+            filter: drop-shadow(0 0 1px rgba(0,0,0,0.3));
+        }
+
+        .navbar-brand-text {
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: #007bff; 
+            user-select: none;
+        }
+    </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Tours" asp-action="Index">SistemaAgenciaTours</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom shadow-sm mb-4">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center" asp-controller="Tours" asp-action="Index">
+                    <img src="~/img/logo escalante tours.png" alt="Escalante Tours Logo" />
+                    <span class="navbar-brand-text">Escalante Tours</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+
+                <div class="collapse navbar-collapse" id="navbarMain">
+                    <ul class="navbar-nav ms-auto align-items-center">
+                        <li class="nav-item me-3">
+                            <a class="btn btn-outline-primary" asp-controller="Tours" asp-action="Index">Tours</a>
+                        </li>
+                        <li class="nav-item me-3">
+                            <a class="btn btn-outline-danger" asp-controller="Tours" asp-action="Carrito">
+                                <i class="bi bi-cart4"></i> Carrito
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
-                        <a class="btn btn-danger" asp-controller="Tours" asp-action="Carrito">Carrito</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="btn btn-danger" asp-controller="Acceso" asp-action="Login">Acceso administrador</a>
+                            <a class="btn btn-primary" asp-controller="Acceso" asp-action="Login">Acceso Admin</a>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - SistemaAgenciaTours - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
+    <main class="container">
+        @RenderBody()
+    </main>
+
+    <footer class="border-top text-center text-muted py-3 mt-5">
+        &copy; 2025 - Escalante Tours
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@3.2.12/dist/jquery.validate.unobtrusive.min.js"></script>
-
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

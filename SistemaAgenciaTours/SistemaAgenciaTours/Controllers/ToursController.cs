@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using SistemaAgenciaTours.Models;
+using Microsoft.Data.SqlClient;
 using SistemaAgenciaTours.Helpers;
+using SistemaAgenciaTours.Models;
 using System.Collections.Generic;
+using System.Text;
 
 namespace SistemaAgenciaTours.Controllers
 {
@@ -37,8 +38,9 @@ namespace SistemaAgenciaTours.Controllers
                             Precio = dr.GetDecimal(dr.GetOrdinal("Precio")),
                             ITBIS = dr.GetDecimal(dr.GetOrdinal("ITBIS")),
                             Estado = dr.GetString(dr.GetOrdinal("Estado")),
-                            DuracionDias = Convert.ToInt32(dr.GetDouble(dr.GetOrdinal("DuracionDias"))),
-                            FechaHoraFin = dr.GetDateTime(dr.GetOrdinal("FechaHoraFin"))
+                            DuracionDias = dr.GetInt32(dr.GetOrdinal("DuracionDias")),
+                            FechaHoraFin = dr.GetDateTime(dr.GetOrdinal("FechaHoraFin")),
+                            ImagenRuta = dr.IsDBNull(dr.GetOrdinal("ImagenRuta")) ? null : dr.GetString(dr.GetOrdinal("ImagenRuta"))
                         });
                     }
                 }
@@ -104,7 +106,6 @@ namespace SistemaAgenciaTours.Controllers
             return destinos;
         }
 
-        // GET: Tours/Crear
         public IActionResult Crear()
         {
             ViewBag.Paises = ObtenerPaises()
@@ -166,8 +167,6 @@ namespace SistemaAgenciaTours.Controllers
             return RedirectToAction("IndexAdministrador");
         }
 
-
-        // GET: Tours/Editar/5
         public IActionResult Editar(int id)
         {
             var tour = ObtenerTours().Find(t => t.TourID == id);
@@ -198,76 +197,73 @@ namespace SistemaAgenciaTours.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Editar(ToursViewModel tour, IFormFile Imagen)
         {
-            ViewBag.Paises = ObtenerPaises()
-                .Select(p => new SelectListItem { Value = p.PaisID.ToString(), Text = p.NombrePais })
-                .ToList();
+            string rutaImagen = null;
 
-            ViewBag.Destinos = ObtenerDestinos()
-                .Select(d => new SelectListItem { Value = d.DestinoID.ToString(), Text = d.NombreDestino })
-                .ToList();
-            
-                tour.ITBIS = tour.Precio * 0.18m;
+            if (Imagen != null && Imagen.Length > 0)
+            {
+                var nombreArchivo = Path.GetFileName(Imagen.FileName);
+                var rutaCarpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/imagenes");
 
-                string rutaImagen = null;
+                if (!Directory.Exists(rutaCarpeta))
+                    Directory.CreateDirectory(rutaCarpeta);
 
-                if (Imagen != null && Imagen.Length > 0)
+                var rutaCompleta = Path.Combine(rutaCarpeta, nombreArchivo);
+
+                using (var stream = new FileStream(rutaCompleta, FileMode.Create))
                 {
-                    var nombreArchivo = Path.GetFileName(Imagen.FileName);
-                    var rutaCarpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/imagenes");
-
-                    if (!Directory.Exists(rutaCarpeta))
-                        Directory.CreateDirectory(rutaCarpeta);
-
-                    var rutaCompleta = Path.Combine(rutaCarpeta, nombreArchivo);
-
-                    using (var stream = new FileStream(rutaCompleta, FileMode.Create))
-                    {
-                        await Imagen.CopyToAsync(stream);
-                    }
-
-                    rutaImagen = "/imagenes/" + nombreArchivo;
+                    await Imagen.CopyToAsync(stream);
                 }
 
+                rutaImagen = "/imagenes/" + nombreArchivo;
+            }
+            else
+            {
                 using (SqlConnection cn = new SqlConnection(cadena))
                 {
-                    string sql = @"UPDATE Tour SET
-                                NombreTour = @NombreTour,
-                                PaisID = @PaisID,
-                                DestinoID = @DestinoID,
-                                Fecha = @Fecha,
-                                Hora = @Hora,
-                                Precio = @Precio";
-
-                                if (rutaImagen != null)
-                                    sql += ", ImagenRuta = @ImagenRuta";
-
-                                    sql += " WHERE TourID = @TourID";
-
-
-
-
-
-                    SqlCommand cmd = new SqlCommand(sql, cn);
-                    cmd.Parameters.AddWithValue("@TourID", tour.TourID);
-                    cmd.Parameters.AddWithValue("@NombreTour", tour.NombreTour);
-                    cmd.Parameters.AddWithValue("@PaisID", tour.PaisID);
-                    cmd.Parameters.AddWithValue("@DestinoID", tour.DestinoID);
-                    cmd.Parameters.AddWithValue("@Fecha", tour.Fecha);
-                    cmd.Parameters.AddWithValue("@Hora", tour.Hora);
-                    cmd.Parameters.AddWithValue("@Precio", tour.Precio);
-                    //cmd.Parameters.AddWithValue("@ITBIS", tour.ITBIS);
-                    if (rutaImagen != null)
-                        cmd.Parameters.AddWithValue("@ImagenRuta", rutaImagen);
+                    string sqlImg = "SELECT ImagenRuta FROM Tour WHERE TourID = @id";
+                    SqlCommand cmdImg = new SqlCommand(sqlImg, cn);
+                    cmdImg.Parameters.AddWithValue("@id", tour.TourID);
                     cn.Open();
-                    cmd.ExecuteNonQuery();
-                    
+                    var result = cmdImg.ExecuteScalar();
+                    if (result != null && result != DBNull.Value)
+                        rutaImagen = result.ToString();
                 }
+            }
+
+
+            tour.ITBIS = tour.Precio * 0.18m;
+
+            using (SqlConnection cn = new SqlConnection(cadena))
+            {
+                string sql = @"UPDATE Tour SET
+                    NombreTour = @NombreTour,
+                    PaisID = @PaisID,
+                    DestinoID = @DestinoID,
+                    Fecha = @Fecha,
+                    Hora = @Hora,
+                    Precio = @Precio,
+                    ImagenRuta = @ImagenRuta
+                WHERE TourID = @TourID";
+
+                SqlCommand cmd = new SqlCommand(sql, cn);
+                cmd.Parameters.AddWithValue("@TourID", tour.TourID);
+                cmd.Parameters.AddWithValue("@NombreTour", tour.NombreTour);
+                cmd.Parameters.AddWithValue("@PaisID", tour.PaisID);
+                cmd.Parameters.AddWithValue("@DestinoID", tour.DestinoID);
+                cmd.Parameters.AddWithValue("@Fecha", tour.Fecha);
+                cmd.Parameters.AddWithValue("@Hora", tour.Hora);
+                cmd.Parameters.AddWithValue("@Precio", tour.Precio);
+                cmd.Parameters.AddWithValue("@ImagenRuta", (object)rutaImagen ?? DBNull.Value);
+
+                cn.Open();
+                cmd.ExecuteNonQuery();
+            }
+
             return RedirectToAction("IndexAdministrador");
         }
 
 
 
-        // GET: Tours/Eliminar/5
         public IActionResult Eliminar(int id)
         {
             var tour = ObtenerTours().Find(t => t.TourID == id);
@@ -341,7 +337,8 @@ namespace SistemaAgenciaTours.Controllers
                                 Hora = dr.GetTimeSpan(dr.GetOrdinal("Hora")),
                                 Precio = dr.GetDecimal(dr.GetOrdinal("Precio")),
                                 ITBIS = dr.GetDecimal(dr.GetOrdinal("ITBIS")),
-                                Estado = dr.GetString(dr.GetOrdinal("Estado"))
+                                Estado = dr.GetString(dr.GetOrdinal("Estado")),
+                                ImagenRuta = dr.GetString(dr.GetOrdinal("ImagenRuta"))
                             });
                         }
                     }
@@ -349,6 +346,25 @@ namespace SistemaAgenciaTours.Controllers
             }
 
             return View(tours);
+        }
+
+        [HttpPost]
+        public IActionResult ExportarToursCSV()
+        {
+            var tours = ObtenerTours(); 
+
+            var csv = new StringBuilder();
+            csv.AppendLine("Tour,País,Destino,Fecha,Hora,Precio,ITBIS,Estado");
+
+            foreach (var tour in tours)
+            {
+                csv.AppendLine($"\"{tour.NombreTour}\",\"{tour.NombrePais}\",\"{tour.NombreDestino}\"," +
+                               $"\"{tour.Fecha:dd/MM/yyyy}\",\"{DateTime.Today.Add(tour.Hora):hh\\:mm}\"," +
+                               $"\"{tour.Precio}\",\"{tour.ITBIS}\",\"{tour.Estado}\"");
+            }
+
+            var bytes = Encoding.UTF8.GetBytes(csv.ToString());
+            return File(bytes, "text/csv", "ToursDisponibles.csv");
         }
 
         public IActionResult EliminarDelCarrito(int id)
