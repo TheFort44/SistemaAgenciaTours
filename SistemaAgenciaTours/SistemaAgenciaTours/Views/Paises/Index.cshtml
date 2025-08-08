@@ -1,0 +1,42 @@
+﻿@model List<SistemaAgenciaTours.Models.PaisViewModel>
+
+@{
+    ViewData["Title"] = "Países y Destinos";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center text-primary mb-4">Países y sus Destinos</h2>
+
+    <div class="text-end mb-3">
+        <a class="btn btn-outline-success" asp-action="ExportarCSV">Exportar a CSV</a>
+    </div>
+
+    @foreach (var pais in Model)
+    {
+        <div class="card mb-3 shadow-sm">
+            <div class="card-header bg-primary text-white fw-bold d-flex align-items-center">
+                <img src="@pais.BanderaRuta" alt="Bandera de @pais.NombrePais" style="height: 30px; width: auto; margin-right: 10px;" />
+                @pais.NombrePais
+            </div>
+            <div class="card-body">
+                @if (pais.Destinos.Any())
+                {
+                    <ul>
+                        @foreach (var destino in pais.Destinos)
+                        {
+                            <li>
+                                <a asp-controller="Tours" asp-action="PorDestino" asp-route-id="@destino.DestinoID">
+                                    @destino.Nombre
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-muted">No hay destinos registrados para este país.</p>
+                }
+            </div>
+        </div>
+    }
+</div>

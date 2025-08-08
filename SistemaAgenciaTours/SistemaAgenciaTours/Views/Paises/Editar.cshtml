@@ -1,0 +1,34 @@
+﻿@model SistemaAgenciaTours.Models.PaisViewModel
+
+@{
+    ViewData["Title"] = "Editar País";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Editar" method="post" enctype="multipart/form-data">
+    <input type="hidden" asp-for="PaisID" />
+
+    <div class="mb-3">
+        <label asp-for="NombrePais"></label>
+        <input asp-for="NombrePais" class="form-control" />
+        <span asp-validation-for="NombrePais" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label>Bandera actual</label><br />
+        <img src="@Model.BanderaRuta" alt="Bandera" width="100" />
+    </div>
+
+    <div class="mb-3">
+        <label>Subir nueva bandera</label>
+        <input asp-for="BanderaFile" type="file" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

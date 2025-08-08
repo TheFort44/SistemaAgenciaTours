@@ -1,0 +1,48 @@
+﻿@model IEnumerable<SistemaAgenciaTours.Models.PaisViewModel>
+
+@{
+    ViewData["Title"] = "Administración de Países";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center text-primary mb-4">🌐 Administración de Países</h2>
+
+    <div class="text-end mb-3">
+        <a asp-controller="Paises" asp-action="Crear" class="btn btn-success">
+            ➕ Agregar País
+        </a>
+    </div>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark text-center">
+            <tr>
+                <th>Bandera</th>
+                <th>Nombre del País</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var pais in Model)
+            {
+                <tr>
+                    <td class="text-center">
+                        <img src="@pais.BanderaRuta" alt="Bandera" style="width: 60px; height: auto; border-radius: 5px;" />
+                    </td>
+                    <td class="align-middle text-center">
+                        @pais.NombrePais
+                    </td>
+                    <td class="text-center">
+                        <div class="btn-group">
+                            <a asp-controller="Paises" asp-action="Editar" asp-route-id="@pais.PaisID" class="btn btn-warning btn-sm">✏️ Editar</a>
+
+                            <form asp-controller="Paises" asp-action="Eliminar" method="post" onsubmit="return confirm('¿Estás seguro de eliminar este país?');">
+                                <input type="hidden" name="id" value="@pais.PaisID" />
+                                <button type="submit" class="btn btn-danger btn-sm">🗑️ Eliminar</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

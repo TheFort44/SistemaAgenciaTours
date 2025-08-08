@@ -49,10 +49,7 @@
                             <button type="submit" class="btn btn-sm btn-warning">Editar</button>
                         </form>
 
-                        <form asp-action="Eliminar" asp-controller="Tours" method="get">
-                            <input type="hidden" name="id" value="@tour.TourID" />
-                            <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-                        </form>
+                        <a asp-action="Eliminar" asp-route-id="@tour.TourID" class="btn btn-danger btn-sm">Eliminar</a>
                     </div>
                 </td>
             </tr>

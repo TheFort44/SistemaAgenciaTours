@@ -107,15 +107,16 @@ namespace SistemaAgenciaTours.Controllers
         }
 
         public IActionResult Crear()
+
+
         {
             ViewBag.Paises = ObtenerPaises()
-                .Select(p => new SelectListItem { Value = p.PaisID.ToString(), Text = p.NombrePais })
-                .ToList();
+    .Select(p => new SelectListItem { Value = p.PaisID.ToString(), Text = p.NombrePais })
+    .ToList();
 
             ViewBag.Destinos = ObtenerDestinos()
                 .Select(d => new SelectListItem { Value = d.DestinoID.ToString(), Text = d.NombreDestino })
                 .ToList();
-
             return View();
         }
 
@@ -197,7 +198,22 @@ namespace SistemaAgenciaTours.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Editar(ToursViewModel tour, IFormFile Imagen)
         {
-            string rutaImagen = null;
+
+            ViewBag.Paises = ObtenerPaises().Select(p => new SelectListItem
+            {
+                Value = p.PaisID.ToString(),
+                Text = p.NombrePais,
+                Selected = (p.PaisID == tour.PaisID)
+            }).ToList();
+
+            ViewBag.Destinos = ObtenerDestinos().Select(d => new SelectListItem
+            {
+                Value = d.DestinoID.ToString(),
+                Text = d.NombreDestino,
+                Selected = (d.DestinoID == tour.DestinoID)
+            }).ToList();
+
+           string rutaImagen = null;
 
             if (Imagen != null && Imagen.Length > 0)
             {
@@ -230,20 +246,19 @@ namespace SistemaAgenciaTours.Controllers
                 }
             }
 
-
             tour.ITBIS = tour.Precio * 0.18m;
 
             using (SqlConnection cn = new SqlConnection(cadena))
             {
                 string sql = @"UPDATE Tour SET
-                    NombreTour = @NombreTour,
-                    PaisID = @PaisID,
-                    DestinoID = @DestinoID,
-                    Fecha = @Fecha,
-                    Hora = @Hora,
-                    Precio = @Precio,
-                    ImagenRuta = @ImagenRuta
-                WHERE TourID = @TourID";
+                        NombreTour = @NombreTour,
+                        PaisID = @PaisID,
+                        DestinoID = @DestinoID,
+                        Fecha = @Fecha,
+                        Hora = @Hora,
+                        Precio = @Precio,
+                        ImagenRuta = @ImagenRuta
+                       WHERE TourID = @TourID";
 
                 SqlCommand cmd = new SqlCommand(sql, cn);
                 cmd.Parameters.AddWithValue("@TourID", tour.TourID);
@@ -253,7 +268,7 @@ namespace SistemaAgenciaTours.Controllers
                 cmd.Parameters.AddWithValue("@Fecha", tour.Fecha);
                 cmd.Parameters.AddWithValue("@Hora", tour.Hora);
                 cmd.Parameters.AddWithValue("@Precio", tour.Precio);
-                cmd.Parameters.AddWithValue("@ImagenRuta", (object)rutaImagen ?? DBNull.Value);
+                cmd.Parameters.AddWithValue("@ImagenRuta", (object) rutaImagen ?? DBNull.Value);
 
                 cn.Open();
                 cmd.ExecuteNonQuery();
@@ -263,35 +278,18 @@ namespace SistemaAgenciaTours.Controllers
         }
 
 
-
         public IActionResult Eliminar(int id)
         {
-            var tour = ObtenerTours().Find(t => t.TourID == id);
-            if (tour == null) return NotFound();
-            return View(tour);
-        }
-
-        [HttpPost, ActionName("Eliminar")]
-        [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
-        {
-            try
+            using (SqlConnection cn = new SqlConnection(cadena))
             {
-                using (SqlConnection cn = new SqlConnection(cadena))
-                {
-                    string sql = "DELETE FROM Tour WHERE TourID = @id";
-                    SqlCommand cmd = new SqlCommand(sql, cn);
-                    cmd.Parameters.AddWithValue("@id", id);
-                    cn.Open();
-                    cmd.ExecuteNonQuery();
-                }
+                string sql = "DELETE FROM dbo.Tour WHERE TourID = @TourID";
+                SqlCommand cmd = new SqlCommand(sql, cn);
+                cmd.Parameters.AddWithValue("@TourID", id);
+                cn.Open();
+                cmd.ExecuteNonQuery();
+            }
 
-                return RedirectToAction(nameof(IndexAdministrador));
-            }
-            catch
-            {
-                return RedirectToAction(nameof(Eliminar), new { id });
-            }
+            return RedirectToAction("IndexAdministrador");
         }
 
         [HttpPost]
@@ -374,5 +372,47 @@ namespace SistemaAgenciaTours.Controllers
             HttpContext.Session.SetObjectAsJson("Carrito", carrito);
             return RedirectToAction("Carrito");
         }
+
+        public IActionResult PorDestino(int id)
+        {
+            var tours = new List<ToursViewModel>();
+
+            using (SqlConnection cn = new SqlConnection(cadena))
+            {
+                string sql = @"
+            SELECT * FROM Vista_TourConEstado
+            WHERE DestinoID = @DestinoID";
+
+                SqlCommand cmd = new SqlCommand(sql, cn);
+                cmd.Parameters.AddWithValue("@DestinoID", id);
+                cn.Open();
+
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        tours.Add(new ToursViewModel
+                        {
+                            TourID = dr.GetInt32(dr.GetOrdinal("TourID")),
+                            NombreTour = dr.GetString(dr.GetOrdinal("NombreTour")),
+                            PaisID = dr.GetInt32(dr.GetOrdinal("PaisID")),
+                            NombrePais = dr.GetString(dr.GetOrdinal("NombrePais")),
+                            DestinoID = dr.GetInt32(dr.GetOrdinal("DestinoID")),
+                            NombreDestino = dr.GetString(dr.GetOrdinal("NombreDestino")),
+                            Fecha = dr.GetDateTime(dr.GetOrdinal("Fecha")),
+                            Hora = dr.GetTimeSpan(dr.GetOrdinal("Hora")),
+                            Precio = dr.GetDecimal(dr.GetOrdinal("Precio")),
+                            ITBIS = dr.GetDecimal(dr.GetOrdinal("ITBIS")),
+                            Estado = dr.GetString(dr.GetOrdinal("Estado")),
+                            DuracionDias = dr.GetInt32(dr.GetOrdinal("DuracionDias")),
+                            ImagenRuta = dr.IsDBNull(dr.GetOrdinal("ImagenRuta")) ? null : dr.GetString(dr.GetOrdinal("ImagenRuta"))
+                        });
+                    }
+                }
+            }
+
+            return View(tours);
+        }
+
     }
 }

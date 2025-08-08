@@ -17,13 +17,13 @@
 
     <div class="form-group mb-3">
         <label asp-for="PaisID"></label>
-        <input asp-for="PaisID" type="number" class="form-control" />
+        <select asp-for="PaisID" class="form-control" asp-items="ViewBag.Paises"></select>
         <span asp-validation-for="PaisID" class="text-danger"></span>
     </div>
 
     <div class="form-group mb-3">
         <label asp-for="DestinoID"></label>
-        <input asp-for="DestinoID" type="number" class="form-control" />
+        <select asp-for="DestinoID" class="form-control" asp-items="ViewBag.Destinos"></select>
         <span asp-validation-for="DestinoID" class="text-danger"></span>
     </div>
 
@@ -47,7 +47,7 @@
 
     <div class="form-group mb-3">
         <label asp-for="ITBIS"></label>
-        <input asp-for="ITBIS" class="form-control" readonly />
+        <input asp-for="ITBIS" class="form-control" readonly id="ITBIS" />
     </div>
 
     <div class="form-group mb-3">
@@ -62,7 +62,7 @@
     </div>
 
     <button type="submit" class="btn btn-primary">Actualizar</button>
-    <a asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
+    <a asp-action="IndexAdministrador" class="btn btn-secondary ms-2">Cancelar</a>
 </form>
 
 @section Scripts {

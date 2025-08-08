@@ -1,8 +1,19 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+@{
+    ViewData["Title"] = "Bienvenido a Escalante Tours";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="d-flex flex-column justify-content-center align-items-center vh-100 bg-light">
+    <h1 class="mb-5 text-primary">Bienvenido a <strong>Escalante Tours</strong></h1>
+
+    <div class="d-flex gap-4">
+        <a asp-controller="Tours" asp-action="Index" class="btn btn-lg btn-primary px-5 py-3 shadow">
+            <i class="bi bi-airplane-engines me-2"></i> Ver Tours
+        </a>
+
+        <a asp-controller="Paises" asp-action="Index" class="btn btn-lg btn-outline-primary px-5 py-3 shadow">
+            <i class="bi bi-geo-alt me-2"></i> Ver Países
+        </a>
+    </div>
 </div>

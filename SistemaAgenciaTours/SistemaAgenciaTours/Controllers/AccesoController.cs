@@ -33,7 +33,7 @@ namespace SistemaAgenciaTours.Controllers
             if (oUsuario.IdUsuario != 0)
             {
                 HttpContext.Session.SetString("usuario", JsonConvert.SerializeObject(oUsuario));
-                return RedirectToAction("IndexAdministrador", "Tours");
+                return RedirectToAction("DashboardAdmin", "Acceso");
             }
             else
             {
@@ -97,5 +97,15 @@ namespace SistemaAgenciaTours.Controllers
             HttpContext.Session.Clear();
             return RedirectToAction("Login", "Acceso");
         }
+
+        public IActionResult DashboardAdmin()
+        {
+            return View();
+        }
+
     }
+
+
+
+
 }

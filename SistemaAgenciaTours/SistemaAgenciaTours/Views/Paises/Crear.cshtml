@@ -1,0 +1,27 @@
+﻿@model SistemaAgenciaTours.Models.PaisViewModel
+
+@{
+    ViewData["Title"] = "Crear País";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Crear" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label asp-for="NombrePais" class="form-label"></label>
+        <input asp-for="NombrePais" class="form-control" />
+        <span asp-validation-for="NombrePais" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Subir imagen de la bandera</label>
+        <input asp-for="BanderaFile" type="file" class="form-control" />
+        <span asp-validation-for="BanderaFile" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Crear</button>
+    <a asp-action="Admin" class="btn btn-secondary ms-2">Cancelar</a>
+</form>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

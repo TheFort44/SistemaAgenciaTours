@@ -1,0 +1,44 @@
+﻿@model List<ToursViewModel>
+
+<h2>Tours disponibles para @Model.FirstOrDefault()?.NombreDestino ?? "Destino"</h2>
+
+@if (!Model.Any())
+{
+    <p>No hay tours disponibles para este destino.</p>
+}
+else
+{
+    <div class="row">
+        @foreach (var tour in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <img src="@tour.ImagenRuta" class="card-img-top" alt="@tour.NombreTour" style="height: 200px; object-fit: cover;" />
+                    <div class="card-body">
+                        <h5 class="card-title">@tour.NombreTour</h5>
+                        <p class="card-text">
+                            <strong>Fecha:</strong> @tour.Fecha.ToString("dd/MM/yyyy") <br />
+                            <strong>Hora:</strong> @DateTime.Today.Add(tour.Hora).ToString("hh:mm tt") <br />
+                            <strong>Precio:</strong> @tour.Precio.ToString("C", new System.Globalization.CultureInfo("es-DO")) <br />
+                            <strong>Estado:</strong>
+                            @if (tour.Estado == "Activo")
+                            {
+                                <span class="badge bg-success">Activo</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">@tour.Estado</span>
+                            }
+                        </p>
+                    </div>
+                    <div class="card-footer bg-white text-end">
+                        <form asp-action="AgregarAlCarrito" asp-controller="Tours" method="post">
+                            <input type="hidden" name="id" value="@tour.TourID" />
+                            <button type="submit" class="btn btn-primary btn-sm">Agregar al carrito</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

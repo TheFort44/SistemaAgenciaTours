@@ -1,0 +1,15 @@
+﻿@{
+    ViewData["Title"] = "Panel de Administrador";
+}
+
+<h2>Bienvenido, Administrador</h2>
+
+<div style="display: flex; gap: 2rem; margin-top: 2rem;">
+    <a asp-controller="Paises" asp-action="Admin" class="btn btn-primary btn-lg">
+        Listado de Países
+    </a>
+
+    <a asp-controller="Tours" asp-action="IndexAdministrador" class="btn btn-success btn-lg">
+        Listado de Tours
+    </a>
+</div>
